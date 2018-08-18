@@ -10,8 +10,8 @@ using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.ApplicationServices.Core;
 
-[assembly: CommandClass(typeof(HongKongBridge.Test))]
-namespace HongKongBridge
+[assembly: CommandClass(typeof(VictoriaBridge.Test))]
+namespace VictoriaBridge
 {
     class Test
     {

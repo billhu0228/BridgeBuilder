@@ -10,7 +10,7 @@ using Autodesk.AutoCAD.ApplicationServices.Core;
 using MyCAD1;
 using System.IO;
 
-namespace HongKongBridge
+namespace VictoriaBridge
 {
     class Bridge
     {
