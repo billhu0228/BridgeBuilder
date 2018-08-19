@@ -33,7 +33,7 @@ namespace VictoriaBridge
                 
 
 
-            ed.WriteMessage("Lovi");
+            ed.WriteMessage("LoveKitty");
             
         }
     }

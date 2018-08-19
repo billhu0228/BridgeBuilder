@@ -18,7 +18,10 @@ namespace MyCAD1
     {
 
 
-
+        public static double GetDistTo(this DBPoint curDBP, DBPoint tarDBP)
+        {
+            return curDBP.Position.DistanceTo(tarDBP.Position);
+        }
 
         public static Line3d GetGenLine(this Line aline)
         {
