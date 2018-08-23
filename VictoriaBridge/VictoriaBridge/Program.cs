@@ -30,7 +30,7 @@ namespace VictoriaBridge
             //bridge.GeomToCad("Geom.dwg");
             //bridge.ToDwg("Node.dwg");
             bridge.ToMidasMct(@"F:\VicFallsBridge\Midas\斜拉桥方案\");
-                
+            bridge.ToMidasMct_CableForce(@"F:\VicFallsBridge\Midas\斜拉桥方案\");
 
 
             ed.WriteMessage("LoveKitty");

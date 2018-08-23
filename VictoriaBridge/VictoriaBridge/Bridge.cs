@@ -18,11 +18,11 @@ namespace VictoriaBridge
     class Bridge
     {
         // private
-        List<DBPoint> NodeList = new List<DBPoint>();
-        List<Line> ElemList = new List<Line>();
+        public List<DBPoint> NodeList = new List<DBPoint>();
+        public List<Line> ElemList = new List<Line>();
         Dictionary<int, double> TowerHeightList = new Dictionary<int, double>();
         Dictionary<int, double> TowerThickList = new Dictionary<int, double>();
-
+        public List<int> TowerControlList = new List<int>();
         double ElemSize = 1000;
 
         int GlobalNodeId = 1;
@@ -38,7 +38,13 @@ namespace VictoriaBridge
         static int CableNpts = 16;
         static double CrossBeamLength = 6000;
         static double TapeBeamLength = 4000;
-
+        double beamlevel = 0;// FrontC.EndPoint.Z;
+        double keyx1 = 0;
+        double keyx2 = 0;
+        double keyx3 = 93000;
+        double keyx4 = 213000;
+        double cabledx = 12000;
+        double tlevel = 91641.1;
         // public paras
         double Length = BeamStep * BeamNpts + (CrossBeamLength + TapeBeamLength) * 2;
 
@@ -83,24 +89,26 @@ namespace VictoriaBridge
         void InitGeometry()
         {
 
-            BackLineA = new Arc(new Point3d(90073.5, 0, -35567.4), 73181.6, 151.661 / 180.0 * Math.PI, 184.248 / 180.0 * Math.PI);
-            BackLineB = new Arc(new Point3d(205573.2, 0, -76400.8), 195138.5, 137.631 / 180.0 * Math.PI, 157.215 / 180.0 * Math.PI);
-            BackLineC = new Line(new Point3d(61400.7, 0, 55103.2), new Point3d(79099.4, 0, 76150.9));
+            BackLineA = new Arc(new Point3d(147559.4, 0, -23239.0), 131668.3, 171.735 / 180.0 * Math.PI, 187.747 / 180.0 * Math.PI);
+            BackLineB = new Arc(new Point3d(153875.7, 0, -23499.1), 137958.0, 140.687 / 180.0 * Math.PI, 172.005 / 180.0 * Math.PI);
+            BackLineC = new Line(new Point3d(47138.2, 0,63905.2), new Point3d(63110.9, 0,83905.2));
             BackLineA.Normal = new Vector3d(0, -1, 0);
             BackLineB.Normal = new Vector3d(0, -1, 0);
             BackLineC.Normal = new Vector3d(0, -1, 0);
-            FrontA = new Line(new Point3d(32718.6, 0, -40988), new Point3d(44730.9, 0, -18943.2));
-            FrontB = new Arc(new Point3d(70575.2, 0, -35198.2), 30531.2, 96.971 / 180.0 * Math.PI, 148.0 / 180.0 * Math.PI);
-            FrontC = new Line(new Point3d(66869.8, 0, -4892.7), new Point3d(58014.8, 0, -1873.8));
-            FrontD = new Arc(new Point3d(64515.1, 0, 17133.5), 20088.1, 179.908 / 180.0 * Math.PI, 251.12 / 180.0 * Math.PI);
-            FrontE = new Arc(new Point3d(109213.1, 0, 15539.8), 64804, 157.104 / 180.0 * Math.PI, 178.609 / 180.0 * Math.PI);
+            FrontA = new Line(new Point3d(28645.4, 0, -40988), new Point3d(37494.7, 0, -15140.6));
+            FrontB = new Arc(new Point3d(53242.1, 0, -21176.5), 16864.5, 89.897 / 180.0 * Math.PI, 159.028 / 180.0 * Math.PI);
+            FrontC = new Line(new Point3d(53272.3, 0,-4312), new Point3d(51422.9, 0, -4007.7));
+            FrontD = new Arc(new Point3d(60418.4, 0, 23668.6), 29101.5, 190.992 / 180.0 * Math.PI,251.995 / 180.0 * Math.PI);
+            FrontE = new Arc(new Point3d(88527, 0,24300.2), 57012.2, 145.728 / 180.0 * Math.PI,186.224 / 180.0 * Math.PI);
 
             FrontA.Normal = new Vector3d(0, -1, 0);
             FrontB.Normal = new Vector3d(0, -1, 0);
             FrontC.Normal = new Vector3d(0, -1, 0);
             FrontD.Normal = new Vector3d(0, -1, 0);
             FrontE.Normal = new Vector3d(0, -1, 0);
-
+            beamlevel = 0;// FrontC.EndPoint.Z;
+            keyx1 = GetBackXCoord(beamlevel);
+            keyx2 = GetFrontXCoord(beamlevel);
         }
 
 
@@ -110,13 +118,14 @@ namespace VictoriaBridge
             Line Elem = new Line();
             DBPoint Node;
 
-            List<double> tmp = Linsteps(FrontA.StartPoint.Z, FrontA.EndPoint.Z, ElemSize).ToList();
+            List<double> tmp = Linsteps(BackLineA.EndPoint.Z, FrontA.EndPoint.Z, ElemSize).ToList();
             tmp = tmp.Concat(Linsteps(FrontA.EndPoint.Z, FrontB.StartPoint.Z, ElemSize)).ToList();
             tmp = tmp.Concat(Linsteps(FrontB.StartPoint.Z, FrontC.EndPoint.Z, ElemSize)).ToList();
-            tmp = tmp.Concat(Linsteps(FrontC.EndPoint.Z, FrontD.StartPoint.Z, ElemSize)).ToList();
+            tmp = tmp.Concat(Linsteps(FrontC.EndPoint.Z,0, ElemSize)).ToList();
+            tmp = tmp.Concat(Linsteps(0, FrontD.StartPoint.Z, ElemSize)).ToList();
             tmp = tmp.Concat(Linsteps(FrontD.StartPoint.Z, FrontE.StartPoint.Z, ElemSize)).ToList();
-            tmp = tmp.Concat(Linsteps(FrontE.StartPoint.Z, BackLineB.StartPoint.Z, ElemSize)).ToList();
-            tmp = tmp.Concat(Linsteps(BackLineB.StartPoint.Z, BackLineC.EndPoint.Z, 1913.4)).ToList();
+            tmp = tmp.Concat(Linsteps(FrontE.StartPoint.Z, BackLineB.StartPoint.Z, 2500)).ToList();
+            tmp = tmp.Concat(Linsteps(BackLineB.StartPoint.Z, BackLineC.EndPoint.Z, 2500)).ToList();
 
             List<double> zlist = new List<double>();
             foreach (double a in tmp)
@@ -138,21 +147,19 @@ namespace VictoriaBridge
 
             foreach (double zi in zlist)
             {
-                if (GlobalElemId>84)
-                {
-                    ;
-                }
+
                 xback = GetBackXCoord(zi);
                 xfront = GetFrontXCoord(zi);
                 thisLayer.Clear();
-                if (zi <= 0)
+                if (zi <= beamlevel)
                 {
                     yleft = -11000;
                     yright = 11000;
                 }
                 else
                 {
-                    yleft =- Math.Sqrt(zi * (-11000 * 11000) / 76150.9 + 11000 * 11000);
+         
+                    yleft = -Math.Sqrt((zi - tlevel) * (11000 * 11000) / (beamlevel - tlevel));
                     yright = -yleft;
                     if(double.IsNaN(yleft) || double.IsNaN(yright))
                     {
@@ -252,6 +259,11 @@ namespace VictoriaBridge
                     }
 
                 }
+                // 增加桥塔控制点
+                if (zi >= beamlevel)
+                {
+                    TowerControlList.Add(thisLayer[0]);
+                }
 
                 if (zi == zlist[0])
                 {                    
@@ -314,15 +326,15 @@ namespace VictoriaBridge
             Line Elem = new Line();
             DBPoint Node=new DBPoint();
             Point3d pt = new Point3d();
-            List<double> towerX = Linsteps(BackLineA.StartPoint.X, FrontC.StartPoint.X, ElemSize).ToList();
-            double dx = FrontC.StartPoint.X - BackLineA.StartPoint.X;
-            double dz = FrontC.StartPoint.Z - BackLineA.StartPoint.Z;
+            List<double> towerX = Linsteps(GetBackXCoord(FrontB.StartPoint.Z), FrontB.StartPoint.X, ElemSize).ToList();
+            //double dx = FrontC.StartPoint.X - BackLineA.StartPoint.X;
+            //double dz = FrontC.StartPoint.Z - BackLineA.StartPoint.Z;
             int ni=0, nj=0;
             for (double yy = -11000; yy<= 11000; yy += 22000)
             {
                 foreach (double xx in towerX)
                 {
-                    double zz = BackLineA.StartPoint.Z + (xx - BackLineA.StartPoint.X) / dx * dz;
+                    double zz = FrontB.StartPoint.Z;
                     pt = new Point3d(xx, yy, zz);
                     Node = new DBPoint(pt);
                     if (xx == towerX[0])
@@ -330,13 +342,18 @@ namespace VictoriaBridge
                         ni = GetClosestDBP(Node);
                         continue;
                     }
-                    if (IsInNodeList(Node)<0)
+                    else if (xx == towerX.Last())
+                    {
+                        nj = GetClosestDBP(Node);
+                    }
+                    else
                     {
                         Node.SetNodeId(db, GlobalNodeId);
                         NodeList.Add(Node);
-                        GlobalNodeId++;                       
+                        GlobalNodeId++;
+                        nj = IsInNodeList(Node);
                     }
-                    nj = IsInNodeList(Node);
+                    
                     if (xx != towerX[0])
                     {                       
                         Elem = new Line(NodeList[GetNodeListIndex(ni)].Position, NodeList[GetNodeListIndex(nj)].Position);
@@ -350,6 +367,19 @@ namespace VictoriaBridge
                     ni = nj;
                 }
             }
+
+
+
+
+            var nsel = from nd in NodeList where (nd.Position.Z == BackLineC.EndPoint.Z) select nd.XData.AsArray()[0].Value;
+            
+            Elem = new Line(NodeList[GetNodeListIndex((short)nsel.ElementAt(0))].Position, 
+                NodeList[GetNodeListIndex((short)nsel.ElementAt(1))].Position);           
+            TowerHeightList.Add(GlobalElemId, 4000);
+            TowerThickList.Add(GlobalElemId, 40);
+            Elem.SetElemXData(db, (short)nsel.ElementAt(0), (short)nsel.ElementAt(1), 0, GlobalElemId, "后塔");
+            ElemList.Add(Elem);
+            GlobalElemId++;
         }
 
 
@@ -361,15 +391,12 @@ namespace VictoriaBridge
             Line Elem = new Line();
             DBPoint Node = new DBPoint();
             Point3d pt = new Point3d();
-            double zz = FrontC.EndPoint.Z;
-            double keyx1 = GetBackXCoord(zz);
-            double keyx2 = GetFrontXCoord(zz);
 
             List<double> tmp = Linsteps(0, keyx1, 2000).ToList();
             tmp = tmp.Concat(Linsteps(keyx1, keyx2, 2000)).ToList();
-            tmp = tmp.Concat(Linsteps(keyx2, 90600, 2000)).ToList();
-            tmp = tmp.Concat(Linsteps(90600, 213000, 13600/4)).ToList();
-            tmp = tmp.Concat(Linsteps(213000, 220000, 2000)).ToList();
+            tmp = tmp.Concat(Linsteps(keyx2, keyx3, 2000)).ToList();
+            tmp = tmp.Concat(Linsteps(keyx3, keyx4, cabledx / 4)).ToList();
+            tmp = tmp.Concat(Linsteps(keyx4, 220000, 2000)).ToList();
 
 
             List<double> beamxlist = new List<double>();
@@ -386,7 +413,7 @@ namespace VictoriaBridge
 
             foreach (double xx in beamxlist)
             {
-                pt = new Point3d(xx, 0, zz);
+                pt = new Point3d(xx, 0, beamlevel);
                 Node = new DBPoint(pt);
                 Node.SetNodeId(db, GlobalNodeId);
                 NodeList.Add(Node);
@@ -405,11 +432,11 @@ namespace VictoriaBridge
 
 
                 int nside;
-                if((xx>= 90600 && xx<=213000 && (xx - 90600) % 13600 == 0))
+                if((xx>= keyx3 && xx<= keyx4 && (xx - keyx3) % cabledx == 0))
                 {
                     for(double yy = -7750; yy <= 15500; yy += 15500)
                     {
-                        pt = new Point3d(xx, yy, zz);
+                        pt = new Point3d(xx, yy, beamlevel);
                         Node = new DBPoint(pt);
                         Node.SetNodeId(db, GlobalNodeId);
                         NodeList.Add(Node);
@@ -428,7 +455,7 @@ namespace VictoriaBridge
                 {
                     for (double yy = -11000; yy <= 11000; yy += 22000)
                     {
-                        pt = new Point3d(xx, yy, 0);
+                        pt = new Point3d(xx, yy, 100);
                         Node = new DBPoint(pt);
                         Node.SetNodeId(db, GlobalNodeId);
                         NodeList.Add(Node);
@@ -465,11 +492,13 @@ namespace VictoriaBridge
             Line Elem = new Line();
             DBPoint Node = new DBPoint();
             Point3d pt = new Point3d();
-            
-   
-            List<double> earthxlist = Linsteps(-18000,-63000,-5000).ToList();
-            List<double> towerzlist = Linsteps(BackLineB.StartPoint.Z, BackLineB.StartPoint.Z+9* 1913.4, 1913.4).ToList();
-            List<double> beamxlist = Linsteps(90600, 213000, 13600).ToList();
+
+            double earthkeyx1 = -30000;
+            double earthkeyx2 = -80000;
+
+            List<double> earthxlist = Linsteps(earthkeyx1, earthkeyx2, -5000).ToList();
+            List<double> towerzlist = Linsteps(FrontE.StartPoint.Z, FrontE.StartPoint.Z+10*2500,2500).ToList();
+            List<double> beamxlist = Linsteps(keyx3, keyx4, cabledx).ToList();
             int nearth, ntower, nbeam;
             int comm = -1;
             foreach (double tz in towerzlist)
@@ -489,7 +518,9 @@ namespace VictoriaBridge
                     GlobalNodeId++;                    
 
                     double tx = GetBackXCoord(tz);
-                    double ty = dir*Math.Sqrt(tz * (-11000 * 11000) / 76150.9 + 11000 * 11000);
+                    double ty = dir* Math.Sqrt((tz - tlevel) * (11000 * 11000) / (beamlevel - tlevel));
+
+                    
                     pt = new Point3d(tx, ty, tz);
                     Node = new DBPoint(pt);
                     ntower = GetClosestDBP(Node);
@@ -579,18 +610,18 @@ namespace VictoriaBridge
             double t = 0;
             if (zz <= BackLineA.StartPoint.Z)
             {
-                h = 8 - (zz - BackLineA.EndPoint.Z) / (BackLineA.StartPoint.Z - BackLineA.EndPoint.Z) * 2;
-                t = 60 - (zz - BackLineA.EndPoint.Z) / (BackLineA.StartPoint.Z - BackLineA.EndPoint.Z) * 20;
+                h = 8 -   (zz - BackLineA.EndPoint.Z) / (BackLineA.StartPoint.Z - BackLineA.EndPoint.Z) * 2;
+                t = 100;
             }
             else if  (zz <= BackLineB.StartPoint.Z)
             {
                 h=6- (zz - BackLineB.EndPoint.Z) / (BackLineB.StartPoint.Z - BackLineB.EndPoint.Z) * 2;
-                t = 40;
+                t = 100-(zz - BackLineB.EndPoint.Z) / (BackLineB.StartPoint.Z - BackLineB.EndPoint.Z)*20;
             }
             else
             {
                 h = 4;
-                t = 40;
+                t = 80;
             }
             return new double[] { 1000*h, t };
 
@@ -684,12 +715,16 @@ namespace VictoriaBridge
         /// <param name="ed"></param>
         /// <param name="step"></param>
         /// <returns></returns>
-        double[] Linsteps(double st, double ed, double step, bool includeEnd = true)
+        public static double[] Linsteps(double st, double ed, double step, bool includeEnd = true)
         {
             List<double> tmp = new List<double>();
             for (int i = 0; Math.Abs(ed-(st + i * step) )>=Math.Abs( step); i++)
             {
                 tmp.Add(st + i * step);
+            }
+            if (tmp.Count == 0)
+            {
+                tmp.Add(st);
             }
 
             if (includeEnd && tmp.Last() != ed)
@@ -869,30 +904,31 @@ namespace VictoriaBridge
 
 
 
+        public  void ToMidasMct_CableForce(string filepath)
+        {
+            using (StreamWriter file = new StreamWriter(Path.Combine(filepath, "调索.mct"),
+                false, System.Text.Encoding.GetEncoding("gbk")))
+            {
+                MCTWriter.CableForce(file, this);
+            }
+        }
+
+
 
         public void ToMidasMct(string filepath)
         {
-            
-            using (StreamWriter file = new StreamWriter(Path.Combine(filepath, "VictoriaBridge.mct"), 
+            using (StreamWriter file = new StreamWriter(Path.Combine(filepath, "VictoriaBridge.mct"),
                 false, System.Text.Encoding.GetEncoding("gbk")))
             {
                 //==============================================================================================
                 // Begin
                 //==============================================================================================
-                file.WriteLine("*UNIT");
-                file.WriteLine("N, mm, KJ, C");
-                file.WriteLine("*MATERIAL");
-                file.WriteLine("1, CONC , C50+  , 0, 0, , C, NO, 0.05, 2, 3.45e4,0.2, 1.0000e-5, {0:E4},0", (2.7e-5));
-                file.WriteLine("2, STEEL, Q420  , 0, 0, , C, NO, 0.02, 1, GB12(S)    ,       , Q420");
-                file.WriteLine("3, STEEL, Q345  , 0, 0, , C, NO, 0.02, 1, GB12(S)    ,       , Q345");
-                file.WriteLine("4, STEEL, Q345+ , 0, 0, , C, NO, 0.02, 2, 2.06e5,0.3, 1.2000e-5,{0:E4},0", (7.698e-5 * 1.12));
-                file.WriteLine("*LOAD-GROUP");
-                file.WriteLine("自重\n");
+                MCTWriter.Beginning(file);
                 //==============================================================================================
                 // Section
                 //==============================================================================================
                 file.WriteLine("*SECTION");
-                foreach(int key in TowerHeightList.Keys)
+                foreach (int key in TowerHeightList.Keys)
                 {
                     if ((string)ElemList[GetElemListIndex(key)].XData.AsArray()[4].Value == "桥塔纵梁")
                     {
@@ -909,18 +945,21 @@ namespace VictoriaBridge
 
 
                 }
-                file.WriteLine("501, DBUSER, cable, CC, 0, 0, 0, 0, 0, 0, YES, SR , 2, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0");
-                //467, DBUSER    , cable             , CC, 0, 0, 0, 0, 0, 0, YES, SR , 2, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0
+                file.WriteLine("501, DBUSER, cable, CC, 0, 0, 0, 0, 0, 0, YES, SR , 2,100, 0, 0, 0, 0, 0, 0, 0, 0, 0");
+                file.WriteLine("503, DBUSER, Rig, CC, 0, 0, 0, 0, 0, 0, YES, SR , 2, 500, 0, 0, 0, 0, 0, 0, 0, 0, 0");
+                file.WriteLine("519, DBUSER, cable-19, CC, 0, 0, 0, 0, 0, 0, YES, SR , 2,58, 0, 0, 0, 0, 0, 0, 0, 0, 0");
+                file.WriteLine("531, DBUSER, cable-31, CC, 0, 0, 0, 0, 0, 0, YES, SR , 2,74, 0, 0, 0, 0, 0, 0, 0, 0, 0");
+                file.WriteLine("537, DBUSER, cable-37, CC, 0, 0, 0, 0, 0, 0, YES, SR , 2,81, 0, 0, 0, 0, 0, 0, 0, 0, 0");
+                file.WriteLine("543, DBUSER, cable-43, CC, 0, 0, 0, 0, 0, 0, YES, SR , 2,87, 0, 0, 0, 0, 0, 0, 0, 0, 0");
+                MCTWriter.CompositeSection(file);
 
-                //file.WriteLine("{0},DBUSER,TowerS-{},CC,0,0,0,0,0,0,YES,BSTF,2,{高度},4000,{顶底板厚度},{腹板}," +
-                // "500,220,22,500,220,22,7,{腹板加劲个数}");
                 //==============================================================================================
                 // Node
                 //==============================================================================================
                 file.WriteLine("*NODE");
-                foreach(DBPoint node in NodeList)
+                foreach (DBPoint node in NodeList)
                 {
-                    int n =(short) node.XData.AsArray()[0].Value;
+                    int n = (short)node.XData.AsArray()[0].Value;
                     file.WriteLine("{0},{1:F3},{2:F3},{3:F3}", n, node.Position.X, node.Position.Y, node.Position.Z);
                 }
                 file.WriteLine("*ELEMENT");
@@ -933,24 +972,48 @@ namespace VictoriaBridge
                     string typestring = (string)elem.XData.AsArray()[4].Value;
                     if (typestring == "主梁")
                     {
-                        file.WriteLine("{0},BEAM,4,12,{1},{2},0", e, ni, nj, GetFixAng(elem));
+                        file.WriteLine("{0},BEAM,4,502,{1},{2},0", e, ni, nj, GetFixAng(elem));
                     }
                     else if (typestring == "刚臂")
                     {
-                        file.WriteLine("{0},BEAM,4,99,{1},{2},0", e, ni, nj);
+                        file.WriteLine("{0},BEAM,9,503,{1},{2},0", e, ni, nj);
                     }
                     else if (typestring == "主索")
                     {
-                        file.WriteLine("{0},TENSTR,4,501,{1},{2},0,1,0,0,NO", e, ni, nj);
+                        if (elem.Bounds.Value.MaxPoint.X <= 153000)
+                        {
+                            file.WriteLine("{0},TENSTR,4,531,{1},{2},0,1,0,0,NO", e, ni, nj);
+                        }
+                        //else if (elem.Bounds.Value.MaxPoint.X <= 153000)
+                        //{
+                        //    file.WriteLine("{0},TENSTR,4,512,{1},{2},0,1,0,0,NO", e, ni, nj);
+                        //}
+                        //else if (elem.Bounds.Value.MaxPoint.X <= 189000)
+                        //{
+                        //    file.WriteLine("{0},TENSTR,4,513,{1},{2},0,1,0,0,NO", e, ni, nj);
+                        //}
+                        else
+                        {
+                            file.WriteLine("{0},TENSTR,4,519,{1},{2},0,1,0,0,NO", e, ni, nj);
+                        }
+
                     }
                     else if (typestring == "背索")
                     {
-                        file.WriteLine("{0},TENSTR,4,501,{1},{2},0,1,0,0,NO", e, ni, nj);
+                        if (elem.Bounds.Value.MinPoint.X >= -45000)
+                        {
+                            file.WriteLine("{0},TENSTR,4,537,{1},{2},0,1,0,0,NO", e, ni, nj);
+                        }
+                        else
+                        {
+                            file.WriteLine("{0},TENSTR,4,543,{1},{2},0,1,0,0,NO", e, ni, nj);
+                        }
+
                     }
                     else
                     {
                         file.WriteLine("{0},BEAM,4,{0},{1},{2},{3}", e, ni, nj, GetFixAng(elem));
-                    }                        
+                    }
                 }
 
                 // 575, TENSTR,    1,   467,   374,   515,     0,     1,     0,     0, NO
@@ -959,69 +1022,73 @@ namespace VictoriaBridge
                 // Constraint
                 //==============================================================================================
                 file.WriteLine("*CONSTRAINT");
-                var nsel = from nd in NodeList where nd.Position.Z == FrontA.StartPoint.Z select nd.XData.AsArray()[0].Value;
-                foreach(short ni in nsel)
-                {
-                    string fixid = "111111";
-                    file.WriteLine("{0},{1},",ni, fixid);
-                }
-
-                nsel = from nd in NodeList where nd.Position.X <0 select nd.XData.AsArray()[0].Value;
+                var nsel = from nd in NodeList where nd.Position.Z == BackLineA.EndPoint.Z select nd.XData.AsArray()[0].Value;
                 foreach (short ni in nsel)
                 {
                     string fixid = "111111";
-                    file.WriteLine("{0},{1},", ni, fixid);
+                    file.WriteLine("{0},{1},AllBNDR", ni, fixid);
                 }
 
-                nsel = from nd in NodeList where (nd.Position.X ==0) select nd.XData.AsArray()[0].Value;
+                nsel = from nd in NodeList where nd.Position.X < 0 select nd.XData.AsArray()[0].Value;
+                foreach (short ni in nsel)
+                {
+                    string fixid = "111111";
+                    file.WriteLine("{0},{1},AllBNDR", ni, fixid);
+                }
+
+                nsel = from nd in NodeList where (nd.Position.X == 0) select nd.XData.AsArray()[0].Value;
                 foreach (short ni in nsel)
                 {
                     string fixid = "111000";
-                    file.WriteLine("{0},{1},", ni, fixid);
+                    file.WriteLine("{0},{1},AllBNDR", ni, fixid);
                 }
 
-                nsel = from nd in NodeList where (nd.Position.X == 220000)  select nd.XData.AsArray()[0].Value;
+                nsel = from nd in NodeList where (nd.Position.X == 220000) select nd.XData.AsArray()[0].Value;
                 foreach (short ni in nsel)
                 {
                     string fixid = "011000";
-                    file.WriteLine("{0},{1},", ni, fixid);
+                    file.WriteLine("{0},{1},AllBNDR", ni, fixid);
                 }
                 file.WriteLine("*ELASTICLINK");
                 double zz = FrontC.EndPoint.Z;
-                double keyx1 = GetBackXCoord(zz);
-                double keyx2 = GetFrontXCoord(zz);
-                nsel = from nd in NodeList where (nd.Position.X == keyx1)&&(nd.Position.Y==11000) select nd.XData.AsArray()[0].Value;
-                file.WriteLine(" 1,{0},{1},GEN,0,10e4,0, 0, 0, 0, 0, NO, 0.5, 0.5,",nsel.ElementAt(0),nsel.ElementAt(1));
+
+                nsel = from nd in NodeList where (nd.Position.X == keyx1) && (nd.Position.Y == 11000) select nd.XData.AsArray()[0].Value;
+                file.WriteLine(" 1,{0},{1},GEN,0,10e7,0, 0, 0, 0, 0, NO, 0.5, 0.5,AllBNDR", nsel.ElementAt(0), nsel.ElementAt(1));
                 nsel = from nd in NodeList where (nd.Position.X == keyx1) && (nd.Position.Y == -11000) select nd.XData.AsArray()[0].Value;
-                file.WriteLine(" 2,{0},{1},GEN,0,10e4,0, 0, 0, 0, 0, NO, 0.5, 0.5,", nsel.ElementAt(0), nsel.ElementAt(1));
-                nsel = from nd in NodeList where (nd.Position.X == keyx2) && (nd.Position.Y ==11000) select nd.XData.AsArray()[0].Value;
-                file.WriteLine(" 3,{0},{1},GEN,0,10e4,0, 0, 0, 0, 0, NO, 0.5, 0.5,", nsel.ElementAt(0), nsel.ElementAt(1));
+                file.WriteLine(" 2,{0},{1},GEN,0,10e7,0, 0, 0, 0, 0, NO, 0.5, 0.5,AllBNDR", nsel.ElementAt(0), nsel.ElementAt(1));
+                nsel = from nd in NodeList where (nd.Position.X == keyx2) && (nd.Position.Y == 11000) select nd.XData.AsArray()[0].Value;
+                file.WriteLine(" 3,{0},{1},GEN,0,10e7,0, 0, 0, 0, 0, NO, 0.5, 0.5,AllBNDR", nsel.ElementAt(0), nsel.ElementAt(1));
                 nsel = from nd in NodeList where (nd.Position.X == keyx2) && (nd.Position.Y == -11000) select nd.XData.AsArray()[0].Value;
-                file.WriteLine(" 4,{0},{1},GEN,0,10e4,0, 0, 0, 0, 0, NO, 0.5, 0.5,", nsel.ElementAt(0), nsel.ElementAt(1));
+                file.WriteLine(" 4,{0},{1},GEN,0,10e7,0, 0, 0, 0, 0, NO, 0.5, 0.5,AllBNDR", nsel.ElementAt(0), nsel.ElementAt(1));
 
 
                 //                *ELASTICLINK
-
                 //   1,   158,   414, GEN  ,     0, 1111, 0, 0, 0, 0, 0, NO, 0.5, 0.5, 
                 //==============================================================================================
                 // Load
                 //==============================================================================================
+                file.WriteLine("*GROUP");
+                file.WriteLine("AllBridge, 1to{0}, 1to{1}, 0", GlobalNodeId - 1, GlobalElemId - 1);
+                MCTWriter.CableIniForce(file, this);
                 file.WriteLine("*STLDCASE");
-                file.WriteLine("自重 , CS, ");
-                file.WriteLine("二期荷载, CS, ");
-                file.WriteLine("梯度升温, TPG, ");
-                file.WriteLine("梯度降温, TPG, ");
-                file.WriteLine("整体升温, T , ");
-                file.WriteLine("整体降温, T , ");
-                file.WriteLine("有车横风, W , ");
-                file.WriteLine("制动力, BRK, ");
-                file.WriteLine("混凝土湿重, CS, ");
+                file.WriteLine("DeadLoad,USER,");  
                 file.WriteLine("*LOADTOMASS, XYZ, YES, YES, YES, YES, 9806");
-                file.WriteLine("自重, 1, 二期荷载, 1");
-                file.WriteLine("*USE-STLD, 自重");
-                file.WriteLine("*SELFWEIGHT, 0, 0, -1, 自重");
-
-
+                file.WriteLine("DeadLoad, 1");
+                file.WriteLine("*USE-STLD, DeadLoad");
+                file.WriteLine("*SELFWEIGHT, 0, 0, -1,AllLoad");
+                file.WriteLine("*CONLOAD");
+                var nnsel = from nd in NodeList where nd.Position.Y == 0 select nd.XData.AsArray()[0].Value;
+                ///人行道板 + 底座：6kN / m
+                ///钢护栏：1kN / m
+                ///铺装2.4ton/m3
+                double ww = (6 + 1 + 1) * 2.0 * 220 * 1000;
+                double liqing = 2.4 * 0.1 * 8.2 * 220.0 * 1000 * 9.8;
+                double fn = (ww + liqing) / nnsel.Count() * -1.0;
+                foreach (short n in nnsel)
+                {                 
+                    file.WriteLine("{0}, 0, 0, {1:F3}, 0, 0, 0,AllLoad ", n, fn);
+                }
+                MCTWriter.CableForceForLC(file,this);
                 //==============================================================================================
                 file.WriteLine("*ENDDATA");
             }
