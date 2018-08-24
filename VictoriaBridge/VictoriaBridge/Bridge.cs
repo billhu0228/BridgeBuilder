@@ -593,12 +593,12 @@ namespace VictoriaBridge
             else if (zz <= FrontB.StartPoint.Z)
             {
                 h = 2.3;
-                t = 40;
+                t = 36;
             }
             else 
             {
                 h = 2;
-                t = 32;
+                t = 28;
             }
             return new double[] { 1000 * h, t };
 
@@ -611,17 +611,17 @@ namespace VictoriaBridge
             if (zz <= BackLineA.StartPoint.Z)
             {
                 h = 8 -   (zz - BackLineA.EndPoint.Z) / (BackLineA.StartPoint.Z - BackLineA.EndPoint.Z) * 2;
-                t = 100;
+                t = 55;
             }
             else if  (zz <= BackLineB.StartPoint.Z)
             {
                 h=6- (zz - BackLineB.EndPoint.Z) / (BackLineB.StartPoint.Z - BackLineB.EndPoint.Z) * 2;
-                t = 100-(zz - BackLineB.EndPoint.Z) / (BackLineB.StartPoint.Z - BackLineB.EndPoint.Z)*20;
+                t = 55-(zz - BackLineB.EndPoint.Z) / (BackLineB.StartPoint.Z - BackLineB.EndPoint.Z)*19;
             }
             else
             {
                 h = 4;
-                t = 80;
+                t = 36;
             }
             return new double[] { 1000*h, t };
 
@@ -932,25 +932,28 @@ namespace VictoriaBridge
                 {
                     if ((string)ElemList[GetElemListIndex(key)].XData.AsArray()[4].Value == "桥塔纵梁")
                     {
-                        file.WriteLine("{0},DBUSER,TowerS-{1},CB,0,0,0,0,0,0,YES,BSTF,2,{2:F3},4000,{3:F3},{4:F3}," +
+                        file.WriteLine("{0},DBUSER,TowerS-{1},CB,0,0,0,0,0,0,YES,NO,BSTF,2,{2:F3},4000,{3:F3},{4:F3}," +
                             "500,220,22,500,220,22,7,{5}", key, key, TowerHeightList[key], TowerThickList[key], TowerThickList[key],
                             ((int)TowerHeightList[key] / 500.0));
                     }
                     else
                     {
-                        file.WriteLine("{0},DBUSER,TowerS-{1},CC,0,0,0,0,0,0,YES,BSTF,2,{2:F3},4000,{3:F3},{4:F3}," +
+                        file.WriteLine("{0},DBUSER,TowerS-{1},CC,0,0,0,0,0,0,YES,NO,BSTF,2,{2:F3},4000,{3:F3},{4:F3}," +
                             "500,220,22,500,220,22,7,{5}", key, key, TowerHeightList[key], TowerThickList[key], TowerThickList[key],
                             ((int)TowerHeightList[key] / 500.0));
                     }
-
-
                 }
-                file.WriteLine("501, DBUSER, cable, CC, 0, 0, 0, 0, 0, 0, YES, SR , 2,100, 0, 0, 0, 0, 0, 0, 0, 0, 0");
-                file.WriteLine("503, DBUSER, Rig, CC, 0, 0, 0, 0, 0, 0, YES, SR , 2, 500, 0, 0, 0, 0, 0, 0, 0, 0, 0");
-                file.WriteLine("519, DBUSER, cable-19, CC, 0, 0, 0, 0, 0, 0, YES, SR , 2,58, 0, 0, 0, 0, 0, 0, 0, 0, 0");
-                file.WriteLine("531, DBUSER, cable-31, CC, 0, 0, 0, 0, 0, 0, YES, SR , 2,74, 0, 0, 0, 0, 0, 0, 0, 0, 0");
-                file.WriteLine("537, DBUSER, cable-37, CC, 0, 0, 0, 0, 0, 0, YES, SR , 2,81, 0, 0, 0, 0, 0, 0, 0, 0, 0");
-                file.WriteLine("543, DBUSER, cable-43, CC, 0, 0, 0, 0, 0, 0, YES, SR , 2,87, 0, 0, 0, 0, 0, 0, 0, 0, 0");
+                file.WriteLine("501, DBUSER, cable, CC, 0, 0, 0, 0, 0, 0, YES,NO, SR , 2,100, 0, 0, 0, 0, 0, 0, 0, 0, 0");
+                file.WriteLine("503, DBUSER, Rig, CC, 0, 0, 0, 0, 0, 0, YES,NO, SR , 2, 500, 0, 0, 0, 0, 0, 0, 0, 0, 0");
+                file.WriteLine("519,DBUSER,cable-19,CC,0,0,0,0,0,0,YES,NO,SR,2, 58, 0, 0, 0, 0, 0, 0, 0, 0, 0");
+                file.WriteLine("531,DBUSER,cable-31,CC,0,0,0,0,0,0,YES,NO,SR,2, 74, 0, 0, 0, 0, 0, 0, 0, 0, 0");               
+                file.WriteLine("537,DBUSER,C15.2-37,CC,0,0,0,0,0,0,YES,NO,SR,2, 81,0, 0, 0, 0, 0, 0, 0, 0, 0");
+                file.WriteLine("543,DBUSER,C15.2-43,CC,0,0,0,0,0,0,YES,NO,SR,2, 87,0, 0, 0, 0, 0, 0, 0, 0, 0");
+                file.WriteLine("555,DBUSER,C15.2-55,CC,0,0,0,0,0,0,YES,NO,SR,2, 99,0, 0, 0, 0, 0, 0, 0, 0, 0");
+                file.WriteLine("561,DBUSER,C15.2-61,CC,0,0,0,0,0,0,YES,NO,SR,2,104,0, 0, 0, 0, 0, 0, 0, 0, 0");
+                file.WriteLine("573,DBUSER,C15.2-73,CC,0,0,0,0,0,0,YES,NO,SR,2,114,0, 0, 0, 0, 0, 0, 0, 0, 0");
+                file.WriteLine("585,DBUSER,C15.2-85,CC,0,0,0,0,0,0,YES,NO,SR,2,123,0, 0, 0, 0, 0, 0, 0, 0, 0");
+                file.WriteLine("591,DBUSER,C15.2-91,CC,0,0,0,0,0,0,YES,NO,SR,2,127,0, 0, 0, 0, 0, 0, 0, 0, 0");
                 MCTWriter.CompositeSection(file);
 
                 //==============================================================================================
@@ -972,7 +975,7 @@ namespace VictoriaBridge
                     string typestring = (string)elem.XData.AsArray()[4].Value;
                     if (typestring == "主梁")
                     {
-                        file.WriteLine("{0},BEAM,4,502,{1},{2},0", e, ni, nj, GetFixAng(elem));
+                        file.WriteLine("{0},BEAM,4,601,{1},{2},0", e, ni, nj, GetFixAng(elem));
                     }
                     else if (typestring == "刚臂")
                     {
@@ -1053,13 +1056,13 @@ namespace VictoriaBridge
                 double zz = FrontC.EndPoint.Z;
 
                 nsel = from nd in NodeList where (nd.Position.X == keyx1) && (nd.Position.Y == 11000) select nd.XData.AsArray()[0].Value;
-                file.WriteLine(" 1,{0},{1},GEN,0,10e7,0, 0, 0, 0, 0, NO, 0.5, 0.5,AllBNDR", nsel.ElementAt(0), nsel.ElementAt(1));
+                file.WriteLine(" 1,{0},{1},GEN,0,10e10,0, 0, 0, 0, 0, NO, 0.5, 0.5,AllBNDR", nsel.ElementAt(0), nsel.ElementAt(1));
                 nsel = from nd in NodeList where (nd.Position.X == keyx1) && (nd.Position.Y == -11000) select nd.XData.AsArray()[0].Value;
-                file.WriteLine(" 2,{0},{1},GEN,0,10e7,0, 0, 0, 0, 0, NO, 0.5, 0.5,AllBNDR", nsel.ElementAt(0), nsel.ElementAt(1));
+                file.WriteLine(" 2,{0},{1},GEN,0,10e10,0, 0, 0, 0, 0, NO, 0.5, 0.5,AllBNDR", nsel.ElementAt(0), nsel.ElementAt(1));
                 nsel = from nd in NodeList where (nd.Position.X == keyx2) && (nd.Position.Y == 11000) select nd.XData.AsArray()[0].Value;
-                file.WriteLine(" 3,{0},{1},GEN,0,10e7,0, 0, 0, 0, 0, NO, 0.5, 0.5,AllBNDR", nsel.ElementAt(0), nsel.ElementAt(1));
+                file.WriteLine(" 3,{0},{1},GEN,0,10e10,0, 0, 0, 0, 0, NO, 0.5, 0.5,AllBNDR", nsel.ElementAt(0), nsel.ElementAt(1));
                 nsel = from nd in NodeList where (nd.Position.X == keyx2) && (nd.Position.Y == -11000) select nd.XData.AsArray()[0].Value;
-                file.WriteLine(" 4,{0},{1},GEN,0,10e7,0, 0, 0, 0, 0, NO, 0.5, 0.5,AllBNDR", nsel.ElementAt(0), nsel.ElementAt(1));
+                file.WriteLine(" 4,{0},{1},GEN,0,10e10,0, 0, 0, 0, 0, NO, 0.5, 0.5,AllBNDR", nsel.ElementAt(0), nsel.ElementAt(1));
 
 
                 //                *ELASTICLINK
@@ -1088,7 +1091,7 @@ namespace VictoriaBridge
                 {                 
                     file.WriteLine("{0}, 0, 0, {1:F3}, 0, 0, 0,AllLoad ", n, fn);
                 }
-                MCTWriter.CableForceForLC(file,this);
+                //MCTWriter.CableForceForLC(file,this);
                 //==============================================================================================
                 file.WriteLine("*ENDDATA");
             }
